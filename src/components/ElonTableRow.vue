@@ -1,5 +1,5 @@
 <template>
-  <div class="table-row" :style="rowStyle">
+  <div class="table-row" ref="cells" :style="rowStyle">
     <elon-table-cell v-for="(column, columnIndex) in columnList"
       :data="props.data"
       :rowIndex="props.index"
@@ -13,7 +13,9 @@
 <script setup lang="ts">
   import {
     reactive,
-    inject
+    inject,
+    ref,
+    defineExpose
   } from 'vue'
   import ElonTableCell from './ELonTableCell.vue'
 
@@ -24,9 +26,15 @@
 
   const columnList = inject('columnList')
   const tableProps = inject('tableProps')
+
+  const cells = ref([])
   
   const rowStyle = reactive({
     'border-bottom': tableProps.border
+  })
+
+  defineExpose({
+    cells
   })
 </script>
 
