@@ -4,9 +4,9 @@
       <slot></slot>
     </div>
     <div class="elon-tbody">
-      <elon-table-row v-for="(rowData, index) in props.data" :data="rowData" :index="index">
+      <elon-table-row ref="rows" v-for="(rowData, index) in tableData" :data="rowData" :index="index">
       </elon-table-row>
-      <div class="selected-border" :style="selectedBorderStyle"></div>
+      <div class="selected-border" :style="selectedInfo.borderStyle"></div>
     </div>
   </div>
 </template>
@@ -15,12 +15,15 @@
   import {
     reactive,
     provide,
-    computed
+    computed,
+    ref,
+    defineExpose,
+    shallowRef
   } from 'vue'
   import ElonTableRow from './ElonTableRow.vue'
+  import VueUndoRedo from '../immer/VueUndoRedo'
 
   const props = defineProps({
-    data: Object,
     border: {
       type: String,
       default: '1px solid #DCDFE6'
@@ -28,11 +31,17 @@
     selectedShadow: {
       type: String,
       default: '0 0 1px 1px #409EFF'
+    },
+    history: {
+      type: Number,
+      default: 64
     }
   })
 
   const columnList = reactive([])
   
+  const rows = ref([])
+
   const selectedInfo = {
     selectedCell: null,
     lastHoverCell: null,
@@ -61,8 +70,18 @@
   })
   provide('columnList', columnList)
   provide('tableProps', props)
-  provide('selectedBorderStyle', selectedBorderStyle)
+  provide('setSelectedCell', setSelectedCell)
+  provide('setLastHoverCell', setLastHoverCell)
+  provide('clearSelected', clearSelected)
+  provide('updateData', updateData)
   
+  defineExpose({
+    initData,
+    updateData,
+    undo,
+    redo,
+    tableData
+  })
 </script>
 
 <style scoped>
@@ -74,5 +93,6 @@
   
   .selected-border {
     position: absolute;
+    pointer-events: none;
   }
 </style>
